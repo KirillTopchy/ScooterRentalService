@@ -113,5 +113,6 @@
             //Assert
             Assert.AreEqual(0, _target.GetScooters().Count);
         }
+
     }
 }
