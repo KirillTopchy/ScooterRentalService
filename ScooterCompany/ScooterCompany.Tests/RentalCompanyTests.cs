@@ -10,25 +10,25 @@ namespace ScooterCompany.Tests
     {
         private IRentalCompany _target;
         private IScooterService _scooterService;
-        private string _defaultName = "Company";
-        private const string Id = "1";
-        private const decimal PricePerMinute = 0.20m;
+        private const string DefaultCompanyName = "Company";
+        private const string DefaultId = "1";
+        private const decimal DefaultPricePerMinute = 0.20m;
 
         [SetUp]
         public void Setup()
         {
             _scooterService = new ScooterService();
-            _target = new RentalCompany(_defaultName, _scooterService);
+            _target = new RentalCompany(DefaultCompanyName, _scooterService);
         }
 
         [Test]
         public void CreateCompany_DefaultName_ShouldReturnDefaultName()
         {
             //Arrange
-            _target = new RentalCompany(_defaultName, _scooterService);
+            _target = new RentalCompany(DefaultCompanyName, _scooterService);
 
             //Assert
-            Assert.AreEqual(_defaultName, _target.Name);
+            Assert.AreEqual(DefaultCompanyName, _target.Name);
         }
 
         [Test]
@@ -49,13 +49,13 @@ namespace ScooterCompany.Tests
         public void StartRent_RentFirstScooter_ScooterShouldBeRented()
         {
             //Arrange
-            _scooterService.AddScooter(Id, PricePerMinute);
+            _scooterService.AddScooter(DefaultId, DefaultPricePerMinute);
 
             //Act
-            _target.StartRent(Id);
+            _target.StartRent(DefaultId);
 
             //Assert
-            var actual = _scooterService.GetScooterById(Id).IsRented;
+            var actual = _scooterService.GetScooterById(DefaultId).IsRented;
             Assert.AreEqual(true, actual);
         }
 
@@ -63,13 +63,44 @@ namespace ScooterCompany.Tests
         public void StartRent_RentAlreadyRentedScooter_ShouldThrowScooterIsRentedException()
         {
             //Arrange
-            _scooterService.AddScooter(Id, PricePerMinute);
+            _scooterService.AddScooter(DefaultId, DefaultPricePerMinute);
 
             //Act
-            _target.StartRent(Id);
+            _target.StartRent(DefaultId);
 
             //Assert
-            Assert.Throws<ScooterIsRentedException>(() =>_target.StartRent(Id));
+            Assert.Throws<ScooterIsRentedException>(() =>_target.StartRent(DefaultId));
+        }
+
+        [Test]
+        public void StartRent_RentNonExistingScooter_ShouldThrowScooterNotFoundException()
+        {
+            //Assert
+            Assert.Throws<ScooterNotFoundException>(() => _target.StartRent(DefaultId));
+        }
+
+        [Test]
+        public void EndRent_EndingRentForRentedScooter_ShouldPass()
+        {
+            //Arrange
+            _scooterService.AddScooter(DefaultId, DefaultPricePerMinute);
+            _target.StartRent(DefaultId);
+
+            //Act
+            var result = _target.EndRent(DefaultId);
+
+            //Assert
+            Assert.Greater(result, 0);
+        }
+
+        [Test]
+        public void EndRent_EndingRentForNotRentedScooter_ShouldThrowScooterNotRentedException()
+        {
+            //Arrange
+            _scooterService.AddScooter(DefaultId, DefaultPricePerMinute);
+
+            //Assert
+            Assert.Throws<ScooterNotRentedException>(() => _target.EndRent(DefaultId));
         }
     }
 }

@@ -8,8 +8,8 @@
     public class ScooterServiceTests
     {
         private IScooterService _target;
-        private const string Id = "1";
-        private const decimal PricePerMinute = 0.20m;
+        private const string DefaultId = "1";
+        private const decimal DefaultPricePerMinute = 0.20m;
 
 
         [SetUp]
@@ -25,7 +25,7 @@
             var expected = 1;
 
             //Act
-            _target.AddScooter(Id, PricePerMinute);
+            _target.AddScooter(DefaultId, DefaultPricePerMinute);
             var actual = _target.GetScooters().Count;
 
             //Assert
@@ -36,13 +36,13 @@
         public void RemoveScooter_1_020_ScooterRemoved()
         {
             //Arrange
-            _target.AddScooter(Id, PricePerMinute);
+            _target.AddScooter(DefaultId, DefaultPricePerMinute);
 
             //Act
-            _target.RemoveScooter(Id);
+            _target.RemoveScooter(DefaultId);
 
             //Assert
-            Assert.Throws<ScooterNotFoundException>(() => _target.GetScooterById(Id));
+            Assert.Throws<ScooterNotFoundException>(() => _target.GetScooterById(DefaultId));
         }
 
         [Test]
@@ -52,7 +52,7 @@
             var pricePerMinute = -0.20m;
 
             //Act
-            Assert.Throws<InvalidPriceException>(() => _target.AddScooter(Id, pricePerMinute));
+            Assert.Throws<InvalidPriceException>(() => _target.AddScooter(DefaultId, pricePerMinute));
         }
 
         [Test]
@@ -62,30 +62,30 @@
             var id = string.Empty;
 
             //Act
-            Assert.Throws<InvalidIdException>(() => _target.AddScooter(id, PricePerMinute));
+            Assert.Throws<InvalidIdException>(() => _target.AddScooter(id, DefaultPricePerMinute));
         }
 
         [Test]
         public void AddScooter_WithExistingId_ShouldFail()
         {
             //Arrange
-            _target.AddScooter(Id, PricePerMinute);
+            _target.AddScooter(DefaultId, DefaultPricePerMinute);
 
             //Act
-            Assert.Throws<IdAlreadyUsedException>(() => _target.AddScooter(Id, PricePerMinute));
+            Assert.Throws<IdAlreadyUsedException>(() => _target.AddScooter(DefaultId, DefaultPricePerMinute));
         }
 
         [Test]
         public void AddScooter_1_GetSameScooterBack()
         {
             //Arrange
-            _target.AddScooter(Id, PricePerMinute);
+            _target.AddScooter(DefaultId, DefaultPricePerMinute);
 
             //Act
-            var scooter = _target.GetScooterById(Id);
+            var scooter = _target.GetScooterById(DefaultId);
 
             //Assert
-            Assert.AreEqual(Id, scooter.Id);
+            Assert.AreEqual(DefaultId, scooter.Id);
         }
 
         [Test]
@@ -95,14 +95,14 @@
             string id = null;
 
             //Act
-            Assert.Throws<InvalidIdException>(() => _target.AddScooter(id, PricePerMinute));
+            Assert.Throws<InvalidIdException>(() => _target.AddScooter(id, DefaultPricePerMinute));
         }
 
         [Test]
         public void RemoveScooter_NotExisting_ShouldFail()
         {
             //Assert
-            Assert.Throws<ScooterNotFoundException>(() => _target.RemoveScooter(Id));
+            Assert.Throws<ScooterNotFoundException>(() => _target.RemoveScooter(DefaultId));
         }
 
         [Test]
@@ -110,9 +110,9 @@
         {
             //Arrange
             var scooters = _target.GetScooters();
-            scooters.Add(new Scooter(Id, PricePerMinute));
-            scooters.Add(new Scooter("2", PricePerMinute));
-            scooters.Add(new Scooter("3", PricePerMinute));
+            scooters.Add(new Scooter(DefaultId, DefaultPricePerMinute));
+            scooters.Add(new Scooter("2", DefaultPricePerMinute));
+            scooters.Add(new Scooter("3", DefaultPricePerMinute));
 
             //Assert
             Assert.AreEqual(0, _target.GetScooters().Count);

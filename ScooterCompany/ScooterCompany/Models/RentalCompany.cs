@@ -37,7 +37,15 @@ namespace ScooterCompany.Models
 
         public decimal EndRent(string id)
         {
-            throw new NotImplementedException();
+            var scooter = _scooterService.GetScooterById(id);
+            if (!scooter.IsRented)
+            {
+                throw new ScooterNotRentedException();
+            }
+
+            scooter.IsRented = false;
+
+            return scooter.PricePerMinute;
         }
 
         public decimal CalculateIncome(int? year, bool includeNotCompletedRentals)
