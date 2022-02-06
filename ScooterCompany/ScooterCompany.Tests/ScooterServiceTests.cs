@@ -8,6 +8,9 @@
     public class ScooterServiceTests
     {
         private IScooterService _target;
+        private const string Id = "1";
+        private const decimal PricePerMinute = 0.20m;
+
 
         [SetUp]
         public void Setup()
@@ -19,12 +22,10 @@
         public void AddScooter_1_020_ScooterAdded()
         {
             //Arrange 
-            var id = "1";
-            var pricePerMinute = 0.20m;
             var expected = 1;
 
             //Act
-            _target.AddScooter(id, pricePerMinute);
+            _target.AddScooter(Id, PricePerMinute);
             var actual = _target.GetScooters().Count;
 
             //Assert
@@ -35,26 +36,23 @@
         public void RemoveScooter_1_020_ScooterRemoved()
         {
             //Arrange
-            var id = "1";
-            var pricePerMinute = 0.20m;
-            _target.AddScooter(id, pricePerMinute);
+            _target.AddScooter(Id, PricePerMinute);
 
             //Act
-            _target.RemoveScooter(id);
+            _target.RemoveScooter(Id);
 
             //Assert
-            Assert.Throws<ScooterNotFoundException>(() => _target.GetScooterById(id));
+            Assert.Throws<ScooterNotFoundException>(() => _target.GetScooterById(Id));
         }
 
         [Test]
         public void AddScooter_1_NegativePrice_ShouldFail()
         {
             //Arrange
-            var id = "1";
             var pricePerMinute = -0.20m;
 
             //Act
-            Assert.Throws<InvalidPriceException>(() => _target.AddScooter(id, pricePerMinute));
+            Assert.Throws<InvalidPriceException>(() => _target.AddScooter(Id, pricePerMinute));
         }
 
         [Test]
@@ -62,22 +60,32 @@
         {
             //Arrange
             var id = string.Empty;
-            var pricePerMinute = 0.20m;
 
             //Act
-            Assert.Throws<InvalidIdException>(() => _target.AddScooter(id, pricePerMinute));
+            Assert.Throws<InvalidIdException>(() => _target.AddScooter(id, PricePerMinute));
         }
 
         [Test]
         public void AddScooter_WithExistingId_ShouldFail()
         {
             //Arrange
-            var id = "1";
-            var pricePerMinute = 0.20m;
-            _target.AddScooter(id, pricePerMinute);
+            _target.AddScooter(Id, PricePerMinute);
 
             //Act
-            Assert.Throws<IdAlreadyUsedException>(() => _target.AddScooter(id, pricePerMinute));
+            Assert.Throws<IdAlreadyUsedException>(() => _target.AddScooter(Id, PricePerMinute));
+        }
+
+        [Test]
+        public void AddScooter_1_GetSameScooterBack()
+        {
+            //Arrange
+            _target.AddScooter(Id, PricePerMinute);
+
+            //Act
+            var scooter = _target.GetScooterById(Id);
+
+            //Assert
+            Assert.AreEqual(Id, scooter.Id);
         }
 
         [Test]
@@ -85,20 +93,16 @@
         {
             //Arrange
             string id = null;
-            var pricePerMinute = 0.20m;
 
             //Act
-            Assert.Throws<InvalidIdException>(() => _target.AddScooter(id, pricePerMinute));
+            Assert.Throws<InvalidIdException>(() => _target.AddScooter(id, PricePerMinute));
         }
 
         [Test]
         public void RemoveScooter_NotExisting_ShouldFail()
         {
-            //Arrange
-            var id = "1";
-
             //Assert
-            Assert.Throws<ScooterNotFoundException>(() => _target.RemoveScooter(id));
+            Assert.Throws<ScooterNotFoundException>(() => _target.RemoveScooter(Id));
         }
 
         [Test]
@@ -106,9 +110,9 @@
         {
             //Arrange
             var scooters = _target.GetScooters();
-            scooters.Add(new Scooter("1", 0.20m));
-            scooters.Add(new Scooter("2", 0.20m));
-            scooters.Add(new Scooter("3", 0.20m));
+            scooters.Add(new Scooter(Id, PricePerMinute));
+            scooters.Add(new Scooter("2", PricePerMinute));
+            scooters.Add(new Scooter("3", PricePerMinute));
 
             //Assert
             Assert.AreEqual(0, _target.GetScooters().Count);
