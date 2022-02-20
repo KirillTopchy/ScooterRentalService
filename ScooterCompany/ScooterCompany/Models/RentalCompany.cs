@@ -53,8 +53,7 @@ namespace ScooterCompany.Models
             }
 
             scooter.IsRented = false;
-            var rented = (_rentedScooters.FirstOrDefault(s => s.Id == id && !s.RentFinished.HasValue));
-            rented.RentFinished = DateTime.UtcNow;
+            var rented = _rentedScooters.FirstOrDefault(s => s.Id == id);
 
             return _calculator.CalculateRent(rented);
         }

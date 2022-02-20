@@ -6,6 +6,6 @@ namespace ScooterCompany.Interfaces
     {
         decimal CalculateRent(RentedScooter scooter);
 
-        decimal CalculateRentForMultipleDays(RentedScooter scooter);
+        decimal CalculateMultipleDaysRent(RentedScooter scooter);
     }
 }

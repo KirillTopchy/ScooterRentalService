@@ -11,27 +11,33 @@ namespace ScooterCompany.Models
 
         public decimal CalculateRent(RentedScooter scooter)
         {
-            decimal totalPrice = 0;
             var rentTime = (TimeSpan)(scooter.RentFinished - scooter.RentStarted);
 
-            // If scooter rent was started and finished at the same day within 24 hours.
+            // If scooter rent was started and finished at the same day.
             if (Math.Floor(rentTime.TotalDays) == 0 && scooter.RentStarted.Date == Convert.ToDateTime(scooter.RentFinished).Date)
             {
-                totalPrice = (decimal)rentTime.TotalMinutes * scooter.Price;
+                var totalPrice = Math.Round((decimal)rentTime.TotalMinutes * scooter.Price,2);
 
                 return CheckIfRentPriceForOneDayIsLessThanMaxPricePerDay(totalPrice);
             }
 
             // If scooter rent start and finish days are different, but total rent time is less than 24 hours.
-            else if (rentTime.TotalDays == 0)
+            if (Math.Floor(rentTime.TotalDays) == 0 && scooter.RentStarted.Date != Convert.ToDateTime(scooter.RentFinished).Date)
             {
-                totalPrice = (decimal)rentTime.TotalMinutes * scooter.Price;
-                return CheckIfRentPriceForOneDayIsLessThanMaxPricePerDay(totalPrice);
+                var firstDayRentalTime = TimeSpan.FromDays(1) - scooter.RentStarted.TimeOfDay;
+                var firstDayRentalPrice = Math.Round((decimal)firstDayRentalTime.TotalMinutes * scooter.Price, 2);
+
+                var secondDay = scooter.RentFinished.Value.TimeOfDay;
+                var secondDayRentalPrice = Math.Round((decimal)secondDay.TotalMinutes * scooter.Price, 2);
+
+                var totalPriceForFirstDay = CheckIfRentPriceForOneDayIsLessThanMaxPricePerDay(firstDayRentalPrice);
+                var totalPriceForSecondDay = CheckIfRentPriceForOneDayIsLessThanMaxPricePerDay(secondDayRentalPrice);
+
+                return totalPriceForFirstDay + totalPriceForSecondDay; 
             }
-            else
-            {
-               return CheckIfRentPriceForOneDayIsLessThanMaxPricePerDay(totalPrice);
-            }
+
+            // If total rent time is more than 24 hours.
+            return CalculateMultipleDaysRent(scooter);
         }
 
         public decimal CheckIfRentPriceForOneDayIsLessThanMaxPricePerDay(decimal totalPrice)
@@ -39,9 +45,22 @@ namespace ScooterCompany.Models
             return totalPrice > _maxPricePerDay ? _maxPricePerDay : totalPrice;
         }
 
-        public decimal CalculateRentForMultipleDays(RentedScooter scooter)
+        public decimal CalculateMultipleDaysRent(RentedScooter scooter)
         {
-            return 1.0m;
+            var fullDaysCounter = 0;
+            var temporaryDate = scooter.RentStarted;
+
+            while (temporaryDate < scooter.RentFinished)
+            {
+                temporaryDate = temporaryDate.AddDays(1);
+                fullDaysCounter++;
+            }
+
+            var lastDay = scooter.RentFinished.Value.TimeOfDay;
+            var lastDayRentalPrice = Math.Round((decimal)lastDay.TotalMinutes * scooter.Price, 2);
+            var totalPriceForLastDay = CheckIfRentPriceForOneDayIsLessThanMaxPricePerDay(lastDayRentalPrice);
+            var totalPrice = Math.Round((decimal)fullDaysCounter * 20 + totalPriceForLastDay,2);
+            return totalPrice;
         }
     }
 }
