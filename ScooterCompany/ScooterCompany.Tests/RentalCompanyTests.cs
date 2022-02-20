@@ -151,6 +151,7 @@ namespace ScooterCompany.Tests
             {
                 Id = DefaultId,
                 RentStarted = startRent,
+
                 Price = DefaultPricePerMinute
             });
 
@@ -159,6 +160,27 @@ namespace ScooterCompany.Tests
 
             //Assert
             Assert.AreEqual(20.0m, result);
+        }
+
+        [Test]
+        public void EndRent_ScooterRented1FullDayAnd15MinutesFromNextDay_ShouldReturn35()
+        {
+            //Arrange
+            _scooterService.AddScooter(DefaultId, DefaultPricePerMinute);
+            _scooterService.GetScooterById(DefaultId).IsRented = true;
+            var startRent = DateTime.UtcNow.AddMinutes(-20);
+            _rentedScooters.Add(new RentedScooter
+            {
+                Id = DefaultId,
+                RentStarted = startRent,
+                Price = DefaultPricePerMinute
+            });
+
+            //Act
+            var result = _target.EndRent(DefaultId);
+
+            //Assert
+            Assert.AreEqual(35.0m, result);
         }
     }
 }
